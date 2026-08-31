@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime, timezone
 from src.common.cache import cache
 from src.common.util import convert_list_dict_camel_to_snake, to_model
+from src.common.synthetic_market_data import get_synthetic_price_history
 from src.common.finance_util import calculate_financial_metrics, calculate_income_stmt_missing, calculate_balance_sheet_missing, calculate_cash_flow_missing
 from src.models.ticker_info_model import TickerInfo
 from src.models.ticker_prices_model import TickerPriceItem
@@ -41,18 +42,11 @@ def get_ticker_prices(symbol: str, interval: str, start_date: str, end_date: str
     :param end_date: 结束日期  2025-06-23
     :return: symbol 的价格数据
     """
-    yf_ticker = yf.Ticker(symbol)
-    data = yf_ticker.history(interval=interval, start=start_date, end=end_date, prepost=True)
-    # 分组名称Date 修改
-    data.index.name = 'date'
-    # 表头命名修改
-    data.rename(columns={'Open': 'open', 'High': 'high', 'Low': 'low', 'Close': 'close', 'Volume': 'volume', 'Dividends': 'dividends', 'Stock Splits': 'stock_splits'}, inplace=True)
+    synthetic_data = get_synthetic_price_history(symbol, interval, start_date, end_date)
+    if not synthetic_data:
+        return []
 
-    # convert  pd.DataFrame to list
-    data = data.reset_index()
-    data = data.to_dict(orient='records')
-    # Convert list of dicts to TickerPriceItem models
-    price_items = [to_model(item, TickerPriceItem) for item in data]
+    price_items = [to_model(item, TickerPriceItem) for item in synthetic_data]
     return price_items
 
 @cache(timeout=60*60)
