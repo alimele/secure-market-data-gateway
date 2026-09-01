@@ -116,6 +116,7 @@ async def ticker_info(symbol: str = Query(..., description="Ticker symbols, eg: 
     description="Get ticker prices",
     response_model=BaseResponse[list[TickerPriceItem]])
 async def ticker_prices(symbol: str = Query(..., description="Ticker symbols, eg: AAPL, 601398.SS"),
+    data_tier: str = Query(default='DELAYED'), #seeded defect
     interval: str = Query(..., description="Time interval, eg: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo"),
     start_date: str = Query(..., description="Start date, eg: 2025-06-23"),
     end_date: str = Query(..., description="End date, eg: 2025-06-23")):

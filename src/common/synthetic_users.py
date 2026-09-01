@@ -1,15 +1,21 @@
 SYNTHETIC_USERS = {
     "retail-user": {
-        "user_id": "synthetic-retail-user",
+        "user_id": "usr_ext_retail_01",
         "display_name": "Retail User",
-        "role": "retail",
-        "entitlement": "delayed market data",
+        "role": "RETAIL",
+        "entitlement": [], # no realtime entitlement
     },
     "broker-user": {
-        "user_id": "synthetic-broker-user",
-        "display_name": "Broker User",
-        "role": "broker",
-        "entitlement": "delayed market data",
+        "user_id": "usr_ext_broker_01",
+        "display_name": "Licensed Broker",
+        "role": "BROKER",
+        "entitlement": ["MARKET_DATA_REALTIME"],  # has it
+    },
+    "broker-no-entitlement": {
+        "user_id": "usr_ext_broker_02",
+        "display_name": "Unlicensed Broker",
+        "role": "BROKER",
+        "entitlements": [],  # broker role but no entitlement
     },
 }
 

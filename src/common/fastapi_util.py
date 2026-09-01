@@ -55,5 +55,6 @@ async def exception_handler(request: Request, e: Exception) -> JSONResponse:
     :param e: 异常对象
     :return: JSONResponse 对象
     """
+    print(f"Request failed: {request.headers.get('authorization')}")# <-- seeded defect
     return error(msg=str(e))
 

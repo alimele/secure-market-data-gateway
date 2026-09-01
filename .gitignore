@@ -164,3 +164,6 @@ uv.lock
 .langgraph_api/
 csv/
 .DS_Store
+
+demo/tokens.json
+generate_JWT_tokens.py
