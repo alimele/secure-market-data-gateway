@@ -21,7 +21,7 @@ Every decision is auditable.
 
 ## Current Structure
 
-financial-data/
+secure-market-data-gateway/
 ├── main.py                          — FastAPI app entry point, routing, auth stub
 ├── src/
 │   ├── api/ticker.py                — Data fetching logic

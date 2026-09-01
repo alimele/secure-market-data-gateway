@@ -1,6 +1,6 @@
 import yfinance as yf
 import pandas as pd
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from src.common.cache import cache
 from src.common.util import convert_list_dict_camel_to_snake, to_model
 from src.common.synthetic_market_data import get_synthetic_price_history
@@ -33,21 +33,38 @@ def get_ticker_info(symbol: str) -> TickerInfo:
 
 
 @cache(timeout=60*60)
-def get_ticker_prices(symbol: str, interval: str, start_date: str, end_date: str) -> list[TickerPriceItem]:
-    """
-    获取 symbol 的价格数据
-    :param symbol: symbol 名称
-    :param interval: 时间间隔 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
-    :param start_date: 开始日期  2025-06-23
-    :param end_date: 结束日期  2025-06-23
-    :return: symbol 的价格数据
+def _fetch_ticker_prices(symbol: str, interval: str, start_date: str, end_date: str) -> list[TickerPriceItem]:
+    """Cached raw price fetch — no tier annotation.
+
+    Used internally by get_ticker_prices (route handler path) and
+    get_financial_items (metrics calculation path). Do not call directly
+    from route handlers; use get_ticker_prices instead.
     """
     synthetic_data = get_synthetic_price_history(symbol, interval, start_date, end_date)
     if not synthetic_data:
         return []
+    return [to_model(item, TickerPriceItem) for item in synthetic_data]
 
-    price_items = [to_model(item, TickerPriceItem) for item in synthetic_data]
-    return price_items
+
+def get_ticker_prices(symbol: str, interval: str, start_date: str, end_date: str, tier: str) -> list[TickerPriceItem]:
+    """Return tier-annotated price items for a route handler call.
+
+    Calls _fetch_ticker_prices (cached) then stamps quote_as_of and data_tier
+    on each item based on the resolved tier:
+      REALTIME: quote_as_of = served_at
+      DELAYED:  quote_as_of = served_at - 15 minutes
+
+    The tier parameter must be 'REALTIME' or 'DELAYED' and must come from
+    the validated JWT claims via policy.resolve_tier() — never from a query param.
+    """
+    items = _fetch_ticker_prices(symbol, interval, start_date, end_date)
+    served_at = datetime.now(timezone.utc)
+    offset = timedelta(0) if tier == "REALTIME" else timedelta(minutes=15)
+    quote_as_of = served_at - offset
+    for item in items:
+        item.quote_as_of = quote_as_of
+        item.data_tier = tier
+    return items
 
 @cache(timeout=60*60)
 def get_ticker_news(symbol: str, count=10) -> list[NewsItem]:
@@ -258,8 +275,8 @@ def get_financial_items(symbol: str, items: list[str] = None, freq="yearly") -> 
     max_date = max_date.strftime('%Y-%m-%d')
     min_date = min_date.strftime('%Y-%m-%d')
 
-    # prices 升序排列
-    prices = get_ticker_prices(symbol, '1d', min_date, max_date)
+    # prices 升序排列 — use raw fetch (no tier annotation needed for metrics calculation)
+    prices = _fetch_ticker_prices(symbol, '1d', min_date, max_date)
 
     # 计算财务指标
     financial_items = []

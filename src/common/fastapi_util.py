@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Optional, TypeVar, Generic
 from fastapi.responses import JSONResponse
 from fastapi.requests import Request
@@ -55,6 +56,6 @@ async def exception_handler(request: Request, e: Exception) -> JSONResponse:
     :param e: 异常对象
     :return: JSONResponse 对象
     """
-    print(f"Request failed: {request.headers.get('authorization')}")# <-- seeded defect
+    logging.warning("Request failed: path=%s error=%s", request.url.path, type(e).__name__)
     return error(msg=str(e))
 

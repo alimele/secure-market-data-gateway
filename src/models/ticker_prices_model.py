@@ -13,3 +13,5 @@ class TickerPriceItem(BaseModel):
     volume: Optional[int] = Field(None, description="Trading volume")
     dividends: Optional[float] = Field(None, description="Dividends")
     stock_splits: Optional[float] = Field(None, description="Stock splits")
+    quote_as_of: Optional[datetime] = Field(None, description="Timestamp the quote is valid as-of (served_at for REALTIME, served_at minus 15 min for DELAYED)")
+    data_tier: Optional[str] = Field(None, description="Data tier: REALTIME or DELAYED")
