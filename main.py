@@ -30,6 +30,10 @@ from src.models.ticker_financial_items_model import FinancialItem
 from src.models.ticker_lookup_model import LookupItem
 import uvicorn
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(name)s %(levelname)s %(message)s",
+)
 
 async def authenticated_claims(
         request: Request = None,
