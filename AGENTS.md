@@ -22,28 +22,29 @@ Every decision is auditable.
 ## Current Structure
 
 financial-data/
-├── main.py              — FastAPI app entry point, routing, auth stub
+├── main.py                          — FastAPI app entry point, routing, auth stub
 ├── src/
-│   ├── api/             — Data fetching logic
-│   ├── common/          — Shared utilities, exception handler
-│   └── models/          — Pydantic data models
-├── json/                — Static JSON data files
-├── demo/                — Prompt pack, tokens, runbook
-├── docs/plans/          — Implementation plans
-├── test.py              — Existing test file
-├── AGENTS.md            — This file
+│   ├── api/ticker.py                — Data fetching logic
+│   ├── common/fastapi_util.py       — Shared utilities, exception handler
+│   ├── common/synthetic_market_data.py — Synthetic instrument prices
+│   ├── common/synthetic_users.py    — Synthetic user personas
+│   └── models/                      — Pydantic data models
+├── json/                            — Static JSON fixture files
+├── demo/tokens.json                 — Fixture JWT tokens (5 personas)
+├── docs/plan/                       — Implementation plans (Bob writes here)
+├── test.py                          — Existing test file
+├── AGENTS.md                        — This file
 └── .bobignore
 
 ---
 
 ## Canonical Commands
 
-Start:   docker compose up --build -d
-Stop:    docker compose down
-Reset:   scripts/reset  (clears audit log, reloads fixture data)
-Health:  http://localhost:8080/health
-Test:    pytest backend/tests/
-Lint:    ruff check backend/
+Start:  uvicorn main:app --reload
+Stop:   Ctrl+C in terminal
+Test:   pytest test.py
+Lint:   ruff check .
+Health: http://localhost:8000/docs
 
 ---
 
@@ -158,8 +159,8 @@ Note:      This secret is synthetic and non-production.
 
 ## Change Constraints
 
-- Do not modify synthetic_data.py instrument prices or user definitions
-  unless explicitly instructed.
+- Do not modify synthetic_market_data.py or synthetic_users.py 
+  instrument prices or user definitions unless explicitly instructed.
 - Do not add calls to external APIs, Yahoo Finance, or any live data source.
 - Preserve the existing public API response shape. Add fields; do not
   remove or rename existing ones.
@@ -178,5 +179,5 @@ A task is complete when:
 2. The same policy applies to both REST and MCP paths.
 3. The audit log records an event for every request.
 4. No secrets or Authorization headers appear in any log output.
-5. All tests pass: pytest backend/tests/
-6. docker compose up --build -d succeeds from a clean state.
+5. All tests pass: pytest test.py
+6. uvicorn main:app --reload starts cleanly from a fresh clone.

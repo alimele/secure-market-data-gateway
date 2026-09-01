@@ -309,7 +309,7 @@ async def ticker_lookup(query: str = Query(..., description="lookup query, eg: A
 
 
 
-mcp = FastApiMCP(app, describe_all_responses=True, headers=["authorization", "authentication", "x-api-key", "api-key", "x-token", "token"])
+mcp = FastApiMCP(app, headers=["authorization", "authentication", "x-api-key", "api-key", "x-token", "token"])
 mcp.mount_http()
 mcp.mount_sse()
 
