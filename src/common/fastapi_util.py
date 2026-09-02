@@ -48,7 +48,7 @@ def error(msg, code=1)->JSONResponse:
     return BaseResponse(code=code, msg=msg)
 
 
-async def exception_handler(request: Request, e: Exception) -> JSONResponse:
+def exception_handler(request: Request, e: Exception) -> JSONResponse:
     """
     异常处理函数
     :param request: 请求对象
