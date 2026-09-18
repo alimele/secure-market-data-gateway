@@ -30,7 +30,6 @@ secure-market-data-gateway/
 │   ├── common/synthetic_users.py    — Synthetic user personas
 │   └── models/                      — Pydantic data models
 ├── json/                            — Static JSON fixture files
-├── demo/tokens.json                 — Fixture JWT tokens (5 personas)
 ├── docs/plan/                       — Implementation plans (Bob writes here)
 ├── test.py                          — Existing test file
 ├── AGENTS.md                        — This file
